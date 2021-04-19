@@ -33,17 +33,27 @@ def one_hot_generation(target,num_classes,batch_size=1):
 
 z = Variable(FloatTensor(np.random.normal(0, 1,(1, opt.latent_dim))))
 
-for i in range(26):
+for i in range(10):
     one_hot = np.zeros((1, 26))
     one_hot[0,i]=1
 
     label_input = Variable(FloatTensor(one_hot))
-    code_input = Variable(FloatTensor(np.random.uniform(-2, 2, (1, opt.code_dim))))
-    device = torch.device("cuda")
-    model.to(device)
+    l1=-2
+    l2=2
+    for j in range(20):
+        l1+=0.2
+        l2-=0.2
+        #c1 = Variable(FloatTensor(np.hstack((c_varied, c_varied2))))
 
-    noise_input = torch.cat((z, label_input),-1)
-    with torch.no_grad():
-        output_ = model(noise_input, code_input).detach().cpu()
-        save_image(output_, 'img{}.png'.format(i))
+        code_input = Variable(FloatTensor([[l1,l2]]))
+
+        print(code_input)
+        device = torch.device("cuda")
+        model.to(device)
+
+        noise_input = torch.cat((z, label_input),-1)
+        print(noise_input.shape)
+        with torch.no_grad():
+            output_ = model(noise_input, code_input).detach().cpu()
+            save_image(output_, 'img{}{}.png'.format(i,l1))
 

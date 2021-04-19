@@ -11,8 +11,8 @@ import torchvision.transforms as transforms
 from models.info_GAN import Discriminator, Generator
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=1000, help="number of epochs of training")
-parser.add_argument("--batch_size", type=int, default=229, help="size of the batches")
+parser.add_argument("--n_epochs", type=int, default=1500, help="number of epochs of training")
+parser.add_argument("--batch_size", type=int, default=175, help="size of the batches")
 parser.add_argument("--lr", type=float, default=0.0005, help="adam: learning rate")
 parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")
 parser.add_argument("--b2", type=float, default=0.999, help="adam: decay of first order momentum of gradient")
@@ -23,11 +23,11 @@ parser.add_argument("--label_dim", type=int, default=26, help="training labels d
 parser.add_argument("--n_classes", type=int, default=26, help="number of classes for dataset")
 parser.add_argument("--img_size", type=int, default=64, help="size of each image dimension")
 parser.add_argument("--channels", type=int, default=1, help="number of image channels")
-parser.add_argument("--sample_interval", type=int, default=20, help="interval between image sampling")
+parser.add_argument("--sample_interval", type=int, default=500, help="interval between image sampling")
 parser.add_argument("--buffer_size", type=int, default=1536, help="size of training data of each letter")
 parser.add_argument("--lambda_con", type=float, default=0.1, help="lambda constant for info loss")
 parser.add_argument("--lambda_gp", type=float, default=10, help="lambda constant for for gradient penalty")
-parser.add_argument("--training_dir", type=str, default="./data/GAN_training_data/dafont", help="style font training directory")
+parser.add_argument("--training_dir", type=str, default="./data/GAN_training_data/dafont/fancy", help="style font training directory")
 parser.add_argument("--training_label_dir", type=str, default="./data/trainin_labels.txt", help="style font training label directory")
 parser.add_argument("--output_static_dir", type=str, default="./results/GAN_opt/static/", help="GANs static output directory")
 parser.add_argument("--output_v1_dir", type=str, default="./results/GAN_opt/varying_c1", help="GANs variation 1 output directory")
@@ -35,6 +35,8 @@ parser.add_argument("--output_v2_dir", type=str, default="./results/GAN_opt/vary
 parser.add_argument("--trained_dir", type=str, default="./trained/generator.pt", help="GANs generator model directory")
 
 opt = parser.parse_args()
+
+
 
 def dataset(training_dir=opt.training_dir):
     """Get training data from data folder"""
@@ -88,7 +90,6 @@ def one_hot_generation(target,num_classes,batch_size=1):
     one_hot = np.zeros((batch_size,num_classes))
     for i in range(batch_size):
         one_hot[i,target] = 1
-    print(target,one_hot)
     return one_hot
 
 def sample_image(n_row, batches_done):
@@ -98,6 +99,27 @@ def sample_image(n_row, batches_done):
     os.makedirs(opt.output_v1_dir, exist_ok=True)
     os.makedirs(opt.output_v2_dir, exist_ok=True)
 
+    os.makedirs(opt.output_static_dir+'/'+str(batches_done), exist_ok=True)
+
+    z = Variable(FloatTensor(np.random.normal(0, 1, (1, opt.latent_dim))))
+
+    for i in range(26):
+        one_hot = np.zeros((1, 26))
+        one_hot[0, i] = 1
+        print(one_hot)
+        label_input = Variable(FloatTensor(one_hot))
+
+
+        code_input = Variable(FloatTensor([[0.5, -0.5]]))
+        device = torch.device("cuda")
+        generator.to(device)
+
+        noise_input = torch.cat((z, label_input), -1)
+        with torch.no_grad():
+            output_ = generator(noise_input, code_input).detach().cpu()
+            save_image(output_, opt.output_static_dir+str(batches_done)+"/img{}.png".format(i))
+
+    """
     # Static sample
     z = Variable(FloatTensor(np.random.normal(0, 1, (n_row * 10, opt.latent_dim))))
     label_input_ = [[]]
@@ -125,9 +147,10 @@ def sample_image(n_row, batches_done):
     save_image(sample1.data, opt.output_v1_dir+"/%d.png" % batches_done, nrow=n_row, normalize=True)
     save_image(sample2.data, opt.output_v2_dir+"/%d.png" % batches_done, nrow=n_row, normalize=True)
 
-
+"""
 
 def train_step(dataloader):
+
     print(
         "--START TRAINING-- \n--TOTAL: %d EPOCHS, BATCH SIZE: %d, LEARNING RATE: %f.--"
         % (opt.n_epochs, opt.batch_size, opt.lr)
@@ -151,7 +174,6 @@ def train_step(dataloader):
 
             # Sample noise and labels as generator input
             z = Variable(FloatTensor(np.random.normal(0, 1, (batch_size, opt.latent_dim))))
-
             label_input = Variable(FloatTensor(one_hot_generation(labels[0],opt.n_classes,batch_size)))
             code_input = Variable(FloatTensor(np.random.uniform(-2, 2, (batch_size, opt.code_dim))))
             noise_input = torch.cat((z, label_input), -1)
