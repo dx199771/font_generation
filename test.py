@@ -1,12 +1,12 @@
 import torch
 import argparse
-from models.info_GAN import Discriminator, Generator
+from nets.info_GAN import Discriminator, Generator
 from torch.autograd import Variable
 import numpy as np
 from torchvision.utils import save_image
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--pre_trained", type=str, default="./trained/generator.pt", help="pre-trained model")
+parser.add_argument("--pre_trained", type=str, default="./models/generator_sanssrif_1500.pt", help="pre-trained model")
 parser.add_argument("--latent_dim", type=int, default=62, help="dimensionality of the latent space")
 parser.add_argument("--code_dim", type=int, default=2, help="latent code dimension")
 parser.add_argument("--label_dim", type=int, default=26, help="training labels dimension")
@@ -38,11 +38,11 @@ for i in range(10):
     one_hot[0,i]=1
 
     label_input = Variable(FloatTensor(one_hot))
-    l1=-2
-    l2=2
+    l1=-1
+    l2=-0.4
     for j in range(20):
-        l1+=0.2
-        l2-=0.2
+        l1+=0.1
+        #2-=0.1
         #c1 = Variable(FloatTensor(np.hstack((c_varied, c_varied2))))
 
         code_input = Variable(FloatTensor([[l1,l2]]))
@@ -51,9 +51,9 @@ for i in range(10):
         device = torch.device("cuda")
         model.to(device)
 
-        noise_input = torch.cat((z, label_input),-1)
+        noise_input = torch.cat((z,label_input),-1)
         print(noise_input.shape)
         with torch.no_grad():
             output_ = model(noise_input, code_input).detach().cpu()
-            save_image(output_, 'img{}{}.png'.format(i,l1))
+            save_image(output_, 'img{},{}.png'.format(i,j))
 

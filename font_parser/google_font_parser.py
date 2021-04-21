@@ -5,10 +5,10 @@ import parser_tools
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--font_srccode", type=str, default="./google_font_src.txt", help="source code of google font")
-parser.add_argument("--opt_zip_dir", type=str, default="../data/Glyph_parser_data/dafont_fancy/zip/", help="downloaded zip font file dir")
-parser.add_argument("--opt_font_dir", type=str, default="../data/Glyph_parser_data/dafont_fancy/unzip/", help="font ttf files dir, change the name for training data")
+parser.add_argument("--opt_zip_dir", type=str, default="../data/Glyph_parser_data/dafont_Sans serif/zip/", help="downloaded zip font file dir")
+parser.add_argument("--opt_font_dir", type=str, default="../data/Glyph_parser_data/dafont_Sans serif/unzip/", help="font ttf files dir, change the name for training data")
 parser.add_argument("--opt_char", type=str, default="abcdefghijklmnopqrstuvwxyz", help="characters that will be trained")
-parser.add_argument("--crop_path", type=str, default="../data/GAN_training_data/dafont/fancy/", help="GANs training data dir")
+parser.add_argument("--crop_path", type=str, default="../data/GAN_training_data/dafont/Sans serif/", help="GANs training data dir")
 
 opt = parser.parse_args()
 
@@ -75,8 +75,8 @@ def dafont_parser(font_source,zip_opt,font_file_opt,downloaded=True):
     return all_tag_href
 
 
-#dafont_parser("https://www.dafont.com/theme.php?cat=105&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
-dafont_parser("https://www.dafont.com/theme.php?cat=105&page=2&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
+dafont_parser("https://www.dafont.com/theme.php?cat=501&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
+dafont_parser("https://www.dafont.com/theme.php?cat=501&page=2&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
 all_ttf_file = parser_tools.list_allfile(opt.opt_font_dir)
 parser_tools.read_img(all_ttf_file, opt.opt_char, opt.crop_path)
 
