@@ -2,16 +2,16 @@ import numpy as np
 import torch
 import argparse
 import utils.texture_synthesis_tools as tools
-import models.vgg16_texture as net
+import nets.vgg16_texture as net
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_width", type=int, default=256, help="width of input image")
 parser.add_argument("--input_height", type=int, default=256, help="height of input image")
-parser.add_argument("--input_file", type=str, default="./data/texture_2.jpg", help="input image url")
-parser.add_argument("--output_file", type=str, default="./Texture_2_processed.jpg", help="output image name")
-parser.add_argument("--output_path", type=str, default="./data", help="output image url")
-parser.add_argument("--epochs", type=int, default="10000", help="numbers epochs of training")
-parser.add_argument("--lr", type=int, default="0.001", help="adam: learning rate")
+parser.add_argument("--input_file", type=str, default="./data/texture_data/colour.jpg", help="input image url")
+parser.add_argument("--output_file", type=str, default="./Texture_processed.jpg", help="output image name")
+parser.add_argument("--output_path", type=str, default="./data/texture_data", help="output image url")
+parser.add_argument("--epochs", type=int, default=15000, help="numbers epochs of training")
+parser.add_argument("--lr", type=float, default="0.001", help="adam: learning rate")
 parser.add_argument("--output_dir", type=str, default="./results/Texture_opt/", help="Output directory of texture synthesis")
 parser.add_argument("--before_opt_filename", type=str, default="Texture_0_before.jpg", help="Output file name before texture synthesis")
 parser.add_argument("--after_opt_filename", type=str, default="Texture_0_after", help="Output file name after texture synthesis")
@@ -60,7 +60,7 @@ def texture_train(input_filename, processed_path, processed_filename, m, eps, op
     # Optimizer
     optimizer = torch.optim.Adam([random.requires_grad_()], lr=opt.lr)
 
-    for i in range(30000):
+    for i in range(eps):
         vgg16.forward(random)
         noise_layers_list = dict(
             {0: vgg16.conv1_1, 1: vgg16.conv1_2, 2: vgg16.pool1, 3: vgg16.conv2_1, 4: vgg16.conv2_2, 5: vgg16.pool2,
@@ -73,12 +73,13 @@ def texture_train(input_filename, processed_path, processed_filename, m, eps, op
         optimizer.zero_grad()
         loss.backward(retain_graph=True)
         optimizer.step()
-        print(i,loss)
-        if(i%150 == 0):
-            final_noise = random
-            final_filename = final_filename+str(i)+".jpg"
-            final_noise_ = tools.post_process_and_display(final_noise, op_dir, final_filename,input_file = 0)
+        print(loss)
 
+        if(i%500 == 0):
+            final_noise = random
+            final_filename_ = final_filename+str(i)+".jpg"
+            final_noise_ = tools.post_process_and_display(final_noise, op_dir, final_filename_,input_file = 0)
+            tools.match_his_output(processed_path+processed_filename, final_noise_,opt.output_path)
     initial_noise = tools.post_process_and_display(random, op_dir, initial_filename,save_file=True)
     return final_noise_
 
@@ -87,6 +88,7 @@ Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
 
 m = [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1),(6, 1),(7, 1),(8, 1),(9 ,1)]
 
+# Start training
 texture_train(opt.input_file,opt.output_path,opt.output_file,m, opt.epochs,opt.output_dir,
               opt.before_opt_filename,opt.after_opt_filename)
 

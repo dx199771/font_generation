@@ -41,7 +41,6 @@ class Vgg16(nn.Module):
             r - VGG_MEAN[2],
         ]), 3)
         bgr = torch.cuda.FloatTensor(bgr).permute(0, 3, 1, 2)
-
         self.bgr = bgr
         self.conv1_1 = self.conv_layer(self.bgr, 'conv1_1')
         self.conv1_2 = self.conv_layer(self.conv1_1, 'conv1_2')
@@ -77,7 +76,7 @@ class Vgg16(nn.Module):
         relu = F.relu(conv)
         return relu
 
-    def avg_pool(self,in_):
+    def avg_pool(self,in_,name):
         avg = F.avg_pool2d(input=in_,kernel_size=(2, 2),stride=(2,2))
         return avg
 

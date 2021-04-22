@@ -5,21 +5,21 @@ import parser_tools
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--font_srccode", type=str, default="./google_font_src.txt", help="source code of google font")
-parser.add_argument("--opt_zip_dir", type=str, default="../data/Glyph_parser_data/dafont_Sans serif/zip/", help="downloaded zip font file dir")
-parser.add_argument("--opt_font_dir", type=str, default="../data/Glyph_parser_data/dafont_Sans serif/unzip/", help="font ttf files dir, change the name for training data")
+parser.add_argument("--opt_zip_dir", type=str, default="../data/Glyph_parser_data/dafont_Bitmap/zip/", help="downloaded zip font file dir")
+parser.add_argument("--opt_font_dir", type=str, default="../data/Glyph_parser_data/dafont_Bitmap/unzip/", help="font ttf files dir, change the name for training data")
 parser.add_argument("--opt_char", type=str, default="abcdefghijklmnopqrstuvwxyz", help="characters that will be trained")
-parser.add_argument("--crop_path", type=str, default="../data/GAN_training_data/dafont/Sans serif/", help="GANs training data dir")
+parser.add_argument("--crop_path", type=str, default="../data/GAN_training_data/dafont/Bitmap/", help="GANs training data dir")
 
 opt = parser.parse_args()
 
 
 def google_font_parser(font_source,zip_opt,font_file_opt, downloaded=True):
     """
-
-    :param font_source:
-    :param zip_opt:
-    :param font_file_opt:
-    :param downloaded:
+    Font source file parser (Google font version)
+    :param font_source: google font source code file dir
+    :param zip_opt: output zip files dir
+    :param font_file_opt: output unzip files dir
+    :param downloaded: if downloaded?
     :return:
     """
 
@@ -52,6 +52,14 @@ def google_font_parser(font_source,zip_opt,font_file_opt, downloaded=True):
     print("Parser google font files done!")
 
 def dafont_parser(font_source,zip_opt,font_file_opt,downloaded=True):
+    """
+    Font files parser (DaFont version)
+    :param font_source: DaFont website url
+    :param zip_opt: output zip files dir
+    :param font_file_opt: output unzip files dir
+    :param downloaded: if downloaded?
+    :return:
+    """
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0'}
     r = requests.get(font_source, headers=headers)
 
@@ -60,6 +68,7 @@ def dafont_parser(font_source,zip_opt,font_file_opt,downloaded=True):
     all_tag_href = soup.find_all("a", class_="dl")
 
     for i in range(len(all_tag_href)):
+        print("Total: {} files, downloaded{}/{}.".format(len(all_tag_href),i,len(all_tag_href)))
         url = all_tag_href[i]["href"]
         # take font name
         font_family = url[21:]
@@ -75,8 +84,8 @@ def dafont_parser(font_source,zip_opt,font_file_opt,downloaded=True):
     return all_tag_href
 
 
-dafont_parser("https://www.dafont.com/theme.php?cat=501&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
-dafont_parser("https://www.dafont.com/theme.php?cat=501&page=2&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
+dafont_parser("https://www.dafont.com/bitmap.php?fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
+dafont_parser("https://www.dafont.com/bitmap.php?page=2&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
 all_ttf_file = parser_tools.list_allfile(opt.opt_font_dir)
 parser_tools.read_img(all_ttf_file, opt.opt_char, opt.crop_path)
 

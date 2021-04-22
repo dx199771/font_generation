@@ -5,12 +5,12 @@ import numpy as np
 
 def list_allfile(path,all_files=[],all_font_files=[],num=3200):
     """
-
-    :param path:
-    :param all_files:
-    :param all_font_files:
-    :param num:
-    :return:
+    List all .ttf files in the path folder.
+    :param path: files directory that will be read
+    :param all_files: all listed files
+    :param all_font_files: all .ttf files
+    :param num: maximum listing files
+    :return: all .ttf files in the path
     """
     if os.path.exists(path):
         files=os.listdir(path)
@@ -22,7 +22,7 @@ def list_allfile(path,all_files=[],all_font_files=[],num=3200):
         else:
             all_files.append(os.path.join(path,file))
     for file in all_files:
-        if re.match('.+\.ttf$',file):
+        if re.match('.+\.ttf$',file): #only read .ttf file(font file)
             all_font_files.append(file)
     return all_font_files[:num]
 

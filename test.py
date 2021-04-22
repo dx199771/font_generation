@@ -23,12 +23,7 @@ model = Generator(opt.channels,opt.img_size,opt.latent_dim+opt.label_dim,opt.cod
 model.load_state_dict(torch.load(opt.pre_trained))
 model.eval()
 
-def one_hot_generation(target,num_classes,batch_size=1):
-    """ One-hot encoding generator for Conditional GAN"""
-    one_hot = np.zeros((batch_size,num_classes))
-    for i in range(len(target)):
-        one_hot[i,target[i]] = 1
-    return one_hot
+
 
 
 z = Variable(FloatTensor(np.random.normal(0, 1,(1, opt.latent_dim))))

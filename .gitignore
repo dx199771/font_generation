@@ -5,3 +5,4 @@
 *.cubin
 *.fatbin
 /data/
+/nets/vgg16.npy

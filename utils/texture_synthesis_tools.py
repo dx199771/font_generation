@@ -8,6 +8,15 @@ import cv2
 
 
 def resize_img(image_path, w, h, output_path_, output_filename):
+    """
+
+    :param image_path:
+    :param w:
+    :param h:
+    :param output_path_:
+    :param output_filename:
+    :return:
+    """
     # This will resize the image to width x height dimensions and then normalize it to [0-1]
     if os.path.isfile(image_path):
         img = Image.open(image_path)
@@ -27,6 +36,7 @@ def resize_img(image_path, w, h, output_path_, output_filename):
 
     else:
         print("There is no image found")
+        return None
 
 
 def compute_layer_output(img_array,model):
@@ -75,7 +85,7 @@ def post_process_and_display(cnn_output, output_path, output_filename,input_file
 
         #matched_img.save(output_path + output_filename)
 
-    return x
+    return output_path + "s"+output_filename
 
 def histogram_matching(org_image, match_image, n_bins=100):
     '''
@@ -120,21 +130,13 @@ def uniform_hist(X):
         Rx[Z[j][1]] = float(start + 1 + n) / 2.0;
     return np.asarray(Rx) / float(len(Rx))
 
+def match_his_output(match,src,opt_dir):
 
+    img_src = cv2.imread(src)
+    img_mat = cv2.imread(match)
+    mathced = histogram_matching(img_src,img_mat)
+    opt_dir = opt_dir+"/test.jpg"
+    cv2.imwrite(opt_dir,mathced)
 
-src = r"C:\Users\User\PycharmProjects\pythonProject\CCFontGANs\image_resources\outputs\sTexture_9_C3_final22200.jpg"
-match = r"C:\Users\User\PycharmProjects\pythonProject\CCFontGANs\data\Texture_8.jpg"
-img = cv2.imread(src)
-img_ = cv2.imread(match)
+    return mathced
 
-print(img_)
-cv2.mean(img)
-a = histogram_matching(img,img_)
-
-for i in range(255):
-    print(a[i,i,0],a[i,i,1],a[i,i,2])
-a = histogram_matching(img,img_)
-print(cv2.mean(a))
-cv2.imwrite("test.jpg",a)
-img = Image.fromarray(a.astype('uint8'), mode='RGB')
-img.save("test2.jpg")
