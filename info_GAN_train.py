@@ -11,9 +11,9 @@ import torchvision.transforms as transforms
 from nets.info_GAN import Discriminator, Generator
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--n_epochs", type=int, default=2000, help="number of epochs of training")
-parser.add_argument("--batch_size", type=int, default=185, help="size of the batches")
-parser.add_argument("--lr", type=float, default=0.0005, help="adam: learning rate")
+parser.add_argument("--n_epochs", type=int, default=3000, help="number of epochs of training")
+parser.add_argument("--batch_size", type=int, default=155, help="size of the batches")
+parser.add_argument("--lr", type=float, default=0.0005, help="azdam: learning rate")
 parser.add_argument("--b1", type=float, default=0.5, help="adam: decay of first order momentum of gradient")
 parser.add_argument("--b2", type=float, default=0.999, help="adam: decay of first order momentum of gradient")
 parser.add_argument("--n_cpu", type=int, default=8, help="number of cpu threads to use during batch generation")
@@ -27,12 +27,12 @@ parser.add_argument("--sample_interval", type=int, default=500, help="interval b
 parser.add_argument("--buffer_size", type=int, default=1536, help="size of training data of each letter")
 parser.add_argument("--lambda_con", type=float, default=0.1, help="lambda constant for info loss")
 parser.add_argument("--lambda_gp", type=float, default=10, help="lambda constant for for gradient penalty")
-parser.add_argument("--training_dir", type=str, default="./data/GAN_training_data/dafont/Bitmap", help="style font training directory")
+parser.add_argument("--training_dir", type=str, default="./data/GAN_training_data/dafont/fancy", help="style font training directory")
 parser.add_argument("--training_label_dir", type=str, default="./data/trainin_labels.txt", help="style font training label directory")
 parser.add_argument("--output_static_dir", type=str, default="./results/GAN_opt/static/", help="GANs static output directory")
 parser.add_argument("--output_v1_dir", type=str, default="./results/GAN_opt/varying_c1", help="GANs variation 1 output directory")
 parser.add_argument("--output_v2_dir", type=str, default="./results/GAN_opt/varying_c2", help="GANs variation 2 output directory")
-parser.add_argument("--trained_dir", type=str, default="./models/generator.pt", help="GANs generator model directory")
+parser.add_argument("--trained_dir", type=str, default="./models/generator_fancy2000.pt", help="GANs generator model directory")
 
 opt = parser.parse_args()
 

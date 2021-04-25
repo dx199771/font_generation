@@ -6,6 +6,7 @@ import numpy as np
 import time
 import inspect
 
+# VGG RGB normalization colour value
 VGG_MEAN = [ 0.40760392,  0.45795686,  0.48501961]
 cuda = True if torch.cuda.is_available() else False
 
@@ -26,8 +27,8 @@ class Vgg16(nn.Module):
 
     def forward(self, rgb):
         """
-        :param rgb:
-        :return:
+        :param rgb: training texture image (RGB)
+        :return: final channel data
         """
         start_time = time.time()
         print("build model...")
@@ -40,7 +41,7 @@ class Vgg16(nn.Module):
             g - VGG_MEAN[1],
             r - VGG_MEAN[2],
         ]), 3)
-        bgr = torch.cuda.FloatTensor(bgr).permute(0, 3, 1, 2)
+        bgr = torch.cuda.FloatTensor(rgb).permute(0, 3, 1, 2)
         self.bgr = bgr
         self.conv1_1 = self.conv_layer(self.bgr, 'conv1_1')
         self.conv1_2 = self.conv_layer(self.conv1_1, 'conv1_2')
@@ -77,15 +78,16 @@ class Vgg16(nn.Module):
         return relu
 
     def avg_pool(self,in_,name):
+        # average pooling function
         avg = F.avg_pool2d(input=in_,kernel_size=(2, 2),stride=(2,2))
         return avg
 
     def get_conv_filter(self, name):
-
+        # Get weight from pre-trained vgg16 model
         self.weight = torch.tensor(self.data_dict[name][0],requires_grad=True).permute(3,2,0,1).cuda()
         return self.weight
 
     def get_bias(self, name):
+        # Get bias from pre-trained vgg16 model
         self.bias = torch.tensor(self.data_dict[name][1],requires_grad=True).cuda()
-
         return self.bias

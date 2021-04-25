@@ -9,12 +9,12 @@ import cv2
 
 def resize_img(image_path, w, h, output_path_, output_filename):
     """
-
-    :param image_path:
-    :param w:
-    :param h:
-    :param output_path_:
-    :param output_filename:
+    Resize image to width x height dimensions and normalize to [0-1]
+    :param image_path: image that will be resized
+    :param w: resize width
+    :param h: resize height
+    :param output_path_: output file path
+    :param output_filename: output file name
     :return:
     """
     # This will resize the image to width x height dimensions and then normalize it to [0-1]
@@ -26,12 +26,11 @@ def resize_img(image_path, w, h, output_path_, output_filename):
         img_resized.save(output_path_ + output_filename)
         img_array = np.array(img_resized, dtype=np.float32)
         img_array = np.expand_dims(img_array, 0)
-        img_array = img_array / 255
+        img_array = img_array / 255 #normalization
         img_array_ = np.squeeze(img_array)
         img_array_ = img_array_ * 255
         img = Image.fromarray(img_array_.astype('uint8'), mode='RGB')
         img.save("test.jpg")
-
         return img_array
 
     else:
@@ -40,6 +39,12 @@ def resize_img(image_path, w, h, output_path_, output_filename):
 
 
 def compute_layer_output(img_array,model):
+    """
+
+    :param img_array:
+    :param model:
+    :return:
+    """
     cuda = True if torch.cuda.is_available() else False
 
     Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
@@ -59,32 +64,47 @@ def compute_layer_output(img_array,model):
     return outputs
 
 
-def post_process_and_display(cnn_output, output_path, output_filename,input_file, save_file=True):
-    # This will take input_noise of (1, w, h, channels) shapped array taken from tensorflow operation
-    # and ultimately displays the image
+def post_process_and_display(cnn_output, output_path, output_filename,input_file, save_file=True, histogram_matched=True):
+    """
+    This function take input noise (1, channels, w, h) shapped array
+    and ultimately output the synthesised texture image.
+    :param cnn_output:
+    :param output_path:
+    :param output_filename:
+    :param input_file:
+    :param save_file:
+    :param histogram_matched:
+    :return:
+    """
+    VGG_MEAN = [0.40760392, 0.45795686, 0.48501961]
 
     x = cnn_output.cpu().detach().numpy()
     x = np.squeeze(x)
 
-    x = (x - x.min()) / (x.max() - x.min())
-    for i in range(255):
-        print(x[i,i,0],x[i,i,1],x[i,i,2])
+    r, g, b = np.split(x, 3, 2)
+    x1 = np.concatenate(([
+        b - VGG_MEAN[0],
+        g - VGG_MEAN[1],
+        r - VGG_MEAN[2],
+    ]), 2)
+
+    #x = (x - x.min()) / (x.max() - x.min())
+    print(x)
+
     x *= 255
     x = np.clip(x, 0, 255)
     img = Image.fromarray(x.astype('uint8'), mode='RGB')
-    #img.show()
     if save_file:
         if not os.path.exists(output_path):
             os.makedirs(output_path)
         img.save(output_path + "s"+output_filename)
-        #img_ = cv2.imread(output_path+ "s" +output_filename)
-
-
-        #matched_img = histogram_matching(new_texture,input_file)
-        #cv2.imwrite(output_path + output_filename, matched_img)
-
-        #matched_img.save(output_path + output_filename)
-
+    """
+    if histogram_matched:
+        img_ = cv2.imread(output_path+ "s" +output_filename)
+        matched_img = histogram_matching(new_texture,input_file)
+        cv2.imwrite(output_path + output_filename, matched_img)
+        matched_img.save(output_path + output_filename)
+    """
     return output_path + "s"+output_filename
 
 def histogram_matching(org_image, match_image, n_bins=100):
@@ -111,7 +131,6 @@ def histogram_matching(org_image, match_image, n_bins=100):
 def uniform_hist(X):
     '''
     Maps data distribution onto uniform histogram
-
     :param X: data vector
     :return: data vector with uniform histogram
     '''
@@ -131,11 +150,17 @@ def uniform_hist(X):
     return np.asarray(Rx) / float(len(Rx))
 
 def match_his_output(match,src,opt_dir):
-
+    """
+    Output matched image
+    :param match: image whose distribution should be matched
+    :param src: image whose distribution should be remapped
+    :param opt_dir: output directory
+    :return: matched image data
+    """
     img_src = cv2.imread(src)
     img_mat = cv2.imread(match)
     mathced = histogram_matching(img_src,img_mat)
-    opt_dir = opt_dir+"/test.jpg"
+    opt_dir = opt_dir+"/matched.jpg"
     cv2.imwrite(opt_dir,mathced)
 
     return mathced

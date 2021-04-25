@@ -5,10 +5,10 @@ import parser_tools
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--font_srccode", type=str, default="./google_font_src.txt", help="source code of google font")
-parser.add_argument("--opt_zip_dir", type=str, default="../data/Glyph_parser_data/dafont_Bitmap/zip/", help="downloaded zip font file dir")
-parser.add_argument("--opt_font_dir", type=str, default="../data/Glyph_parser_data/dafont_Bitmap/unzip/", help="font ttf files dir, change the name for training data")
+parser.add_argument("--opt_zip_dir", type=str, default="../data/Glyph_parser_data/dafont_comic/zip/", help="downloaded zip font file dir")
+parser.add_argument("--opt_font_dir", type=str, default="../data/Glyph_parser_data/dafont_comic/unzip/", help="font ttf files dir, change the name for training data")
 parser.add_argument("--opt_char", type=str, default="abcdefghijklmnopqrstuvwxyz", help="characters that will be trained")
-parser.add_argument("--crop_path", type=str, default="../data/GAN_training_data/dafont/Bitmap/", help="GANs training data dir")
+parser.add_argument("--crop_path", type=str, default="../data/GAN_training_data/dafont/comic/", help="GANs training data dir")
 
 opt = parser.parse_args()
 
@@ -79,13 +79,13 @@ def dafont_parser(font_source,zip_opt,font_file_opt,downloaded=True):
 
         parser_tools.create_folder(font_file_opt)
         # unzip files
-        parser_tools.unzip_file(zip_opt+font_family+".zip",font_file_opt)
+        #  parser_tools.unzip_file(zip_opt+font_family+".zip",font_file_opt)
 
     return all_tag_href
 
 
-dafont_parser("https://www.dafont.com/bitmap.php?fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
-dafont_parser("https://www.dafont.com/bitmap.php?page=2&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=False)
+dafont_parser("https://www.dafont.com/theme.php?cat=102&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=True)
+dafont_parser("https://www.dafont.com/theme.php?cat=102&page=2&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=True)
 all_ttf_file = parser_tools.list_allfile(opt.opt_font_dir)
 parser_tools.read_img(all_ttf_file, opt.opt_char, opt.crop_path)
 
