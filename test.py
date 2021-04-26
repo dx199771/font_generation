@@ -6,7 +6,7 @@ import numpy as np
 from torchvision.utils import save_image
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--pre_trained", type=str, default="./models/generator_bitmap_2000.pt", help="pre-trained model")
+parser.add_argument("--pre_trained", type=str, default="./models/generator_SansSerif.pt", help="pre-trained model")
 parser.add_argument("--latent_dim", type=int, default=62, help="dimensionality of the latent space")
 parser.add_argument("--code_dim", type=int, default=2, help="latent code dimension")
 parser.add_argument("--label_dim", type=int, default=26, help="training labels dimension")
@@ -49,8 +49,6 @@ for i in range(21):
     with torch.no_grad():
 
         sample1 = model(noise_input, c1).detach().cpu()
-
-
 
         print(sample1.shape)
         img = save_image(sample1.data, 'cache/img{}.png'.format(i) , nrow=20, normalize=True)

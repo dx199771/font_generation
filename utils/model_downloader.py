@@ -6,6 +6,10 @@
 import gdown
 
 def vgg16_model_downloader():
+    """
+    vgg16 model downloader for texture synthesis network
+    :return:
+    """
     # download vgg16 model for texture synthesis from google drive
     # model name
     vgg16_model_name = "./vgg16.npy"

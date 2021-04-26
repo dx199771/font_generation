@@ -9,7 +9,7 @@ from PIL import Image
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_width", type=int, default=256, help="width of input image")
 parser.add_argument("--input_height", type=int, default=256, help="height of input image")
-parser.add_argument("--input_file", type=str, default="./data/texture_data/stone.jpg", help="input ground truth image url")
+parser.add_argument("--input_file", type=str, default="./data/texture_data/wood3.jpg", help="input ground truth image url")
 parser.add_argument("--output_file", type=str, default="./Texture_processed.jpg", help="output ground truth processed image name")
 parser.add_argument("--output_path", type=str, default="./data/texture_data", help="output synthesised image url")
 parser.add_argument("--epochs", type=int, default=15000, help="numbers epochs of training")
