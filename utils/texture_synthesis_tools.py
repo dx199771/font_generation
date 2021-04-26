@@ -5,9 +5,10 @@ import torch
 import scipy
 import scipy.interpolate
 import cv2
+import torchvision.transforms as transforms
 
 
-def resize_img(image_path, w, h, output_path_, output_filename):
+def resize_img(image_path, w, h, output_path_, output_filename,device):
     """
     Resize image to width x height dimensions and normalize to [0-1]
     :param image_path: image that will be resized
@@ -23,15 +24,21 @@ def resize_img(image_path, w, h, output_path_, output_filename):
         img_resized = img.resize(size=(w, h))
         if not os.path.exists(output_path_):
             os.makedirs(output_path_)
+        # vgg16 model mean
+        mean = [0.5, 0.5, 0.5]
+        # data transformation
+        data_transform = transforms.Compose([
+            transforms.Resize((h, w)),
+            # transforms.CenterCrop(opt.img_size),
+            transforms.ToTensor(),
+            transforms.Normalize((mean[0], mean[1], mean[2]), (1, 1, 1)),
+        ])
+        texture_data = data_transform(img)
         img_resized.save(output_path_ + output_filename)
-        img_array = np.array(img_resized, dtype=np.float32)
-        img_array = np.expand_dims(img_array, 0)
-        img_array = img_array / 255 #normalization
-        img_array_ = np.squeeze(img_array)
-        img_array_ = img_array_ * 255
-        img = Image.fromarray(img_array_.astype('uint8'), mode='RGB')
-        img.save("test.jpg")
-        return img_array
+        texture_data = texture_data.unsqueeze(0).to(device)
+        print(texture_data.min(), texture_data.max(),"xx")
+
+        return texture_data
 
     else:
         print("There is no image found")
@@ -50,7 +57,7 @@ def compute_layer_output(img_array,model):
     Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
 
     vgg = model
-    img_array = Tensor(img_array)
+    #img_array = Tensor(img_array)
     vgg.forward(img_array)
 
     content_layers_list = dict({0: vgg.conv1_1, 1: vgg.conv1_2, 2: vgg.pool1, 3: vgg.conv2_1, 4: vgg.conv2_2, 5: vgg.pool2, 6: vgg.conv3_1,
@@ -76,24 +83,24 @@ def post_process_and_display(cnn_output, output_path, output_filename,input_file
     :param histogram_matched:
     :return:
     """
-    VGG_MEAN = [0.40760392, 0.45795686, 0.48501961]
-
     x = cnn_output.cpu().detach().numpy()
-    x = np.squeeze(x)
+    x_ = np.squeeze(x)
 
-    r, g, b = np.split(x, 3, 2)
-    x1 = np.concatenate(([
-        b - VGG_MEAN[0],
-        g - VGG_MEAN[1],
-        r - VGG_MEAN[2],
-    ]), 2)
+    std = [1,1,1]
+    mean = [0.5, 0.5, 0.5]
 
-    #x = (x - x.min()) / (x.max() - x.min())
-    print(x)
+    # denormlization
+    x_[0, :, :] = x_[0, :, :] * std[0] + mean[0]
+    x_[1, :, :] = x_[1, :, :] * std[1] + mean[1]
+    x_[2, :, :] = x_[2, :, :] * std[2] + mean[2]
 
-    x *= 255
-    x = np.clip(x, 0, 255)
-    img = Image.fromarray(x.astype('uint8'), mode='RGB')
+    x_ *= 255
+    x_ = np.clip(x_, 0, 255)
+    x_ = np.transpose(x_,(1,2,0))
+
+    cv2.imwrite(output_path+"/matched.jpg",x_)
+
+    img = Image.fromarray(x_.astype('uint8'), mode='RGB')
     if save_file:
         if not os.path.exists(output_path):
             os.makedirs(output_path)

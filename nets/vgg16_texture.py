@@ -6,8 +6,7 @@ import numpy as np
 import time
 import inspect
 
-# VGG RGB normalization colour value
-VGG_MEAN = [ 0.40760392,  0.45795686,  0.48501961]
+
 cuda = True if torch.cuda.is_available() else False
 
 Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
@@ -32,17 +31,8 @@ class Vgg16(nn.Module):
         """
         start_time = time.time()
         print("build model...")
-        self.rgb_scaled = rgb
-        # convert
-        r, g, b = torch.split(self.rgb_scaled, 1, 3)
-
-        bgr = torch.cat(([
-            b - VGG_MEAN[0],
-            g - VGG_MEAN[1],
-            r - VGG_MEAN[2],
-        ]), 3)
-        bgr = torch.cuda.FloatTensor(rgb).permute(0, 3, 1, 2)
-        self.bgr = bgr
+        #bgr = torch.cuda.FloatTensor(rgb).permute(0, 3, 1, 2)
+        self.bgr = rgb
         self.conv1_1 = self.conv_layer(self.bgr, 'conv1_1')
         self.conv1_2 = self.conv_layer(self.conv1_1, 'conv1_2')
         self.pool1 = self.avg_pool(self.conv1_2, 'pool1')

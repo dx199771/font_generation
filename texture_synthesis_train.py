@@ -1,8 +1,10 @@
 import numpy as np
 import torch
+
 import argparse
 import utils.texture_synthesis_tools as tools
 import nets.vgg16_texture as net
+from PIL import Image
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_width", type=int, default=256, help="width of input image")
@@ -51,14 +53,19 @@ def texture_train(input_filename, processed_path, processed_filename, m, eps, op
         vgg16 = vgg16.cuda()
 
     # Read and pre-process training image
-    texture_data = tools.resize_img(input_filename, opt.input_width, opt.input_height, processed_path,
-                                    processed_filename)
+    texture_data = tools.resize_img(input_filename, opt.input_width, opt.input_height, processed_path,processed_filename, device)
+
     texture_outputs = tools.compute_layer_output(texture_data, vgg16)
 
+    # data normalizaiton parameters
     # Generate random initial noise data
-    random = 0.5 * np.random.randn(texture_data.shape[0],texture_data.shape[1],texture_data.shape[2],texture_data.shape[3])
-    random = Tensor(random)
 
+    random = np.random.rand(texture_data.shape[0],texture_data.shape[1],texture_data.shape[2],texture_data.shape[3])
+    # normalization
+    random[:, 0, :, :] = random[:, 0, :, :] - mean[0]
+    random[:, 1, :, :] = random[:, 1, :, :] - mean[1]
+    random[:, 2, :, :] = random[:, 2, :, :] - mean[2]
+    random = Tensor(random)
     # Feed to vgg16
     vgg16.forward(random)
 
@@ -80,20 +87,22 @@ def texture_train(input_filename, processed_path, processed_filename, m, eps, op
         optimizer.step()
         print("Epoch:{}/{} Loss:{}.".format(i,eps,loss))
 
-        if(i%500 == 0):
+        if(i%499 == 0):
             final_noise = random
             final_filename_ = final_filename+str(i)+".jpg"
             final_noise_ = tools.post_process_and_display(final_noise, op_dir, final_filename_,input_file = 0)
             tools.match_his_output(processed_path+processed_filename, final_noise_,opt.output_path)
-    initial_noise = tools.post_process_and_display(random, op_dir, initial_filename,save_file=True)
+    #initial_noise = tools.post_process_and_display(random, op_dir, initial_filename,save_file=True)
     return final_noise_
 
 # if gpu available
 cuda = True if torch.cuda.is_available() else False
 Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
-
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+# VGG RGB normalization colour value
+mean = [0.5, 0.5, 0.5]
 #
-m = [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1),(6, 1),(7, 1),(8, 1),(9 ,1)]
+m = [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1),(9, 1), (10, 1), (11, 1), (12, 1), (13, 1)]
 
 # Start training
 texture_train(opt.input_file,opt.output_path,opt.output_file,m, opt.epochs,opt.output_dir,
