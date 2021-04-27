@@ -26,3 +26,6 @@ download them and drag it into ./nets
 
 
 If you have any question about operating the system, please contact my email address: xudong9771@gmail.com
+
+Many Thanks,
+Xu Dong

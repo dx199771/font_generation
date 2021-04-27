@@ -9,10 +9,10 @@ from PIL import Image
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_width", type=int, default=256, help="width of input image")
 parser.add_argument("--input_height", type=int, default=256, help="height of input image")
-parser.add_argument("--input_file", type=str, default="./data/texture_data/wood3.jpg", help="input ground truth image url")
+parser.add_argument("--input_file", type=str, default="./data/texture_data/earth.jpg", help="input ground truth image url")
 parser.add_argument("--output_file", type=str, default="./Texture_processed.jpg", help="output ground truth processed image name")
 parser.add_argument("--output_path", type=str, default="./data/texture_data", help="output synthesised image url")
-parser.add_argument("--epochs", type=int, default=15000, help="numbers epochs of training")
+parser.add_argument("--epochs", type=int, default=10000, help="numbers epochs of training")
 parser.add_argument("--lr", type=float, default="0.001", help="adam: learning rate")
 parser.add_argument("--output_dir", type=str, default="./results/Texture_opt/", help="Output directory of texture synthesis")
 parser.add_argument("--before_opt_filename", type=str, default="Texture_0_before.jpg", help="Output file name before texture synthesis")
@@ -102,7 +102,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # VGG RGB normalization colour value
 mean = [0.5, 0.5, 0.5]
 #
-m = [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1),(9, 1), (10, 1), (11, 1), (12, 1), (13, 1)]
+m = [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1), (9, 1)]
 
 # Start training
 texture_train(opt.input_file,opt.output_path,opt.output_file,m, opt.epochs,opt.output_dir,

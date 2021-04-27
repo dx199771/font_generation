@@ -4,5 +4,6 @@
 *.ptx
 *.cubin
 *.fatbin
-/data/
+/data/GAN_training_data
+/data/Glyph_parser_data
 /nets/vgg16.npy

@@ -1,36 +1,43 @@
 import cv2
 import os
 import numpy as np
-src_img = "./11.png"
-texture_img = "./Texture_4.jpg"
-im = cv2.imread(src_img)
-texture = cv2.imread(texture_img)
+import argparse
 
-s_h, s_w, s_c = im.shape
-h, w, c = texture.shape
-texture = cv2.resize(texture,(s_h,s_w),cv2.INTER_AREA)
+parser = argparse.ArgumentParser()
+parser.add_argument("--src_img", type=str, default="../results/GAN_opt/static/116500/img24.png", help="input ground truth image url")
+parser.add_argument("--texture_img", type=str, default="../data/texture_data/desert_final_av4.jpg", help="input ground truth image url")
+parser.add_argument("--opt_size", type=int, default="256", help="output generated font image size")
+opt = parser.parse_args()
 
+def texture_mixture(src, texture_, size):
+    """
+    Apply synthesised texture on generated glyph images
+    :param src: sorce glyph image
+    :param texture_: source texture image
+    :return:
+    """
+    im = cv2.imread(src)
+    texture = cv2.imread(texture_)
 
-imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+    s_h, s_w, s_c = im.shape
+    texture = cv2.resize(texture,(s_h,s_w),cv2.INTER_AREA)
+    imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
 
-ret,thresh = cv2.threshold(imgray,127,255,0)
+    ret,thresh = cv2.threshold(imgray,127,255,0)
 
-contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    for i in range(s_h):
+        for j in range(s_w):
+            if (thresh[j,i] == 0):
+                texture[j,i,0] = 255
+                texture[j,i,1] = 255
+                texture[j,i,2] = 255
 
+    texture = cv2.resize(texture,(size,size),cv2.INTER_AREA)
 
-img = cv2.drawContours(texture, contours, -1, 0, 1)
+    cv2.imwrite("../output.png",texture)
 
-print(len(contours))
-for i in range(s_h):
-    for j in range(s_w):
-        if (cv2.pointPolygonTest(contours[0],(i,j),True))<0 or (cv2.pointPolygonTest(contours[1],(i,j),True))>0:
-            img[j,i,0] = 0
-            img[j,i,1] = 0
-            img[j,i,2] = 0
+    cv2.imshow("contours",texture)
+    cv2.waitKey(0)
+    cv2.destroyWindow()
 
-texture = cv2.resize(img,(512,512),cv2.INTER_AREA)
-
-
-cv2.imshow("contours",texture)
-cv2.waitKey(0)
-cv2.destroyWindow()
+texture_mixture(opt.src_img,opt.texture_img, opt.opt_size)
