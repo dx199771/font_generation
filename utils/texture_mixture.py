@@ -9,19 +9,17 @@ parser.add_argument("--texture_img", type=str, default="../data/texture_data/des
 parser.add_argument("--opt_size", type=int, default="256", help="output generated font image size")
 opt = parser.parse_args()
 
-def texture_mixture(src, texture_, size):
+def mixture(src, texture_, size):
     """
     Apply synthesised texture on generated glyph images
     :param src: sorce glyph image
     :param texture_: source texture image
     :return:
     """
-    im = cv2.imread(src)
-    texture = cv2.imread(texture_)
 
-    s_h, s_w, s_c = im.shape
-    texture = cv2.resize(texture,(s_h,s_w),cv2.INTER_AREA)
-    imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
+    s_h, s_w, s_c = src.shape
+    texture = cv2.resize(texture_,(s_h,s_w),cv2.INTER_AREA)
+    imgray = cv2.cvtColor(src,cv2.COLOR_BGR2GRAY)
 
     ret,thresh = cv2.threshold(imgray,127,255,0)
 
@@ -40,4 +38,4 @@ def texture_mixture(src, texture_, size):
     cv2.waitKey(0)
     cv2.destroyWindow()
 
-texture_mixture(opt.src_img,opt.texture_img, opt.opt_size)
+#mixture(opt.src_img,opt.texture_img, opt.opt_size)
