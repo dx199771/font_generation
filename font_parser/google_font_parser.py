@@ -83,15 +83,11 @@ def dafont_parser(font_source,zip_opt,font_file_opt,downloaded=True):
 
     return all_tag_href
 
-
+"""
 dafont_parser("https://www.dafont.com/theme.php?cat=102&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=True)
 dafont_parser("https://www.dafont.com/theme.php?cat=102&page=2&fpp=200", opt.opt_zip_dir,opt.opt_font_dir,downloaded=True)
 all_ttf_file = parser_tools.list_allfile(opt.opt_font_dir)
 parser_tools.read_img(all_ttf_file, opt.opt_char, opt.crop_path)
-
-
-"""
-
 
 # Pulling data from google font
 #google_font_parser(opt.font_srccode,opt.opt_zip_dir,opt.opt_font_dir,downloaded=True)

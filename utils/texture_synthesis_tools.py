@@ -16,7 +16,7 @@ def resize_img(image_path, w, h, output_path_, output_filename,device):
     :param h: resize height
     :param output_path_: output file path
     :param output_filename: output file name
-    :return:
+    :return: normalized processed image
     """
     # This will resize the image to width x height dimensions and then normalize it to [0-1]
     if os.path.isfile(image_path):
@@ -47,10 +47,10 @@ def resize_img(image_path, w, h, output_path_, output_filename,device):
 
 def compute_layer_output(img_array,model):
     """
-
-    :param img_array:
-    :param model:
-    :return:
+    Compute each layer's output
+    :param img_array: image data
+    :param model: VGG model
+    :return: each layer's output in a array
     """
     cuda = True if torch.cuda.is_available() else False
 

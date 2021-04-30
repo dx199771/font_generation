@@ -101,7 +101,7 @@ Tensor = torch.cuda.FloatTensor if cuda else torch.Tensor
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 # VGG RGB normalization colour value
 mean = [0.5, 0.5, 0.5]
-#
+# processing layers
 m = [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1), (7, 1), (8, 1), (9, 1)]
 
 # Start training
