@@ -4,7 +4,6 @@ import torch
 import argparse
 import utils.texture_synthesis_tools as tools
 import nets.vgg16_texture as net
-from PIL import Image
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_width", type=int, default=256, help="width of input image")
