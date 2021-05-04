@@ -30,6 +30,25 @@ download them and drag them into ./data/GAN_training_data/   folder.
 if you want to train you texture, you need to download the pre-trained vgg16.npy file from google drive: https://drive.google.com/file/d/1wMXkLIDOiOepUoAjbhuCx7RssCTRRUp1/view?usp=sharing
 download them and drag it into ./nets, or automatically download them in the notebook.
 
+Folder specification:
+
+--->data:
+------>GAN_training_data: training data for glyph generation
+------>Glyph_parser_data: raw training data for glyph generation(unzip files)
+------>texture_data: training data and generated texture images
+--->font_parser: glyph images parser
+--->models: pre-trained glyph generation models
+--->nets: glyph generation and texture synthesis network
+--->results:
+------>GAN_opt: glyph generation results during training
+------>Texture_opt: texture synthesis results during training
+--->utils: some tools for training and testing
+->evaluator.py: evaluator for trained models
+->info_GAN_train.py main glyph generation file
+->texture_synthesis_train.py main texture synthesis file
+->playground.ipynb notebook for training and testing
+->main.py testing file(recommend using playground.ipynb)
+
 If you have any questions about operating the system, please contact my email address: xudong9771@gmail.com
 
 Many Thanks,
